@@ -1,94 +1,51 @@
 package main
-import ("fmt"
+
+import (
+	"encoding/xml"
+	"fmt"
+	"io/ioutil"
 	"net/http"
-"io/ioutil"
-"encoding/xml")
+	"strings"
+)
 
-// index structure at the time of writing this code 
-/*
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/politics.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/opinions.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/local.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/sports.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/national.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/world.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/business.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/technology.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/lifestyle.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/entertainment.xml
-</loc>
-</sitemap>
-<sitemap>
-<loc>
-https://www.washingtonpost.com/news-sitemaps/goingoutguide.xml
-</loc>
-</sitemap>
-</sitemapindex>
-
-*/
-
-type SitemapIndex struct {
-	// slice of type Location
-	Locations [] Location `xml:"sitemap"`
+type Sitemapindex struct {
+	Locations []string `xml:"sitemap>loc"`
 }
 
-type Location struct {
-	Loc string `xml:"loc"`
+type News struct {
+	Titles []string `xml:"url>news>title"`
+	Keywords []string `xml:"url>news>keywords"`
+	Locations []string `xml:"url>loc"`
 }
 
-func (l Location) String() string {
-	return fmt.Sprintf(l.Loc)
+type NewsMap struct {
+	Keyword string
+	Location string
 }
 
 func main() {
-	resp,_ := http.Get("https://www.washingtonpost.com/news-sitemaps/index.xml")
-	bytes,_ := ioutil.ReadAll(resp.Body)
-	//string_body := string(bytes)
-	//fmt.Println(string_body)
-	resp.Body.Close()
-	var s SitemapIndex
+	var s Sitemapindex
+	var n News
+	resp, _ := http.Get("https://www.washingtonpost.com/news-sitemaps/index.xml")
+	//temp := strings.Split(Location, "\n")
+	//resp , _ := http.Get(temp[1])
+	bytes, _ := ioutil.ReadAll(resp.Body)
 	xml.Unmarshal(bytes, &s)
-	//fmt.Printf("Here %s some %s","are","variables")
+	news_map := make(map[string]NewsMap)
+
 	for _, Location := range s.Locations {
-		fmt.Printf("%s",Location)
+		Location = strings.TrimSpace(Location) // required for new structure
+		resp, _ := http.Get(Location)
+		bytes, _ := ioutil.ReadAll(resp.Body)
+		xml.Unmarshal(bytes, &n)
+
+		for idx, _ := range n.Keywords {
+			news_map[n.Titles[idx]] = NewsMap{n.Keywords[idx], n.Locations[idx]}
+		}
+	}
+	for idx, data := range news_map {
+		fmt.Println("\n\n\n\n\n",idx)
+		fmt.Println("\n",data.Keyword)
+		fmt.Println("\n",data.Location)
 	}
 }
