@@ -87,5 +87,8 @@ func main() {
 	resp.Body.Close()
 	var s SitemapIndex
 	xml.Unmarshal(bytes, &s)
-	fmt.Println(s.Locations)
+	//fmt.Printf("Here %s some %s","are","variables")
+	for _, Location := range s.Locations {
+		fmt.Printf("%s",Location)
+	}
 }
