@@ -11,6 +11,8 @@ type car struct {
 	top_speed_kmh float64
 }
 
+// methods are not same as function since they are associated with structures
+// return kmh() in float
 func (c car) kmh() float64 {
 	return float64(c.gas_pedal) * (c.top_speed_kmh/usixteenbitmax)
 }
