@@ -16,15 +16,28 @@ type car struct {
 func (c car) kmh() float64 {
 	return float64(c.gas_pedal) * (c.top_speed_kmh/usixteenbitmax)
 }
-func (c car) mph() float64 {
+
+// Should I define methods on values or pointers?
+// https://golang.org/doc/faq#methods_on_values_or_pointers
+
+func (c *car) mph() float64 {
+	c.top_speed_kmh = 500
 	return float64(c.gas_pedal) * (c.top_speed_kmh/usixteenbitmax/kmh_multiple)
 }
+
+func (c *car) new_top_speed(newspeed float64) {
+	c.top_speed_kmh = newspeed
+}
+
 func main() {
 	a_car := car{gas_pedal: 65000, 
 				brake_pedal: 0, 
 				steering_wheel: 12361,
 				top_speed_kmh: 225.0}
 	fmt.Println(a_car.gas_pedal)
+	fmt.Println(a_car.kmh())
+	fmt.Println(a_car.mph())
+	a_car.new_top_speed(500)
 	fmt.Println(a_car.kmh())
 	fmt.Println(a_car.mph())
 }
