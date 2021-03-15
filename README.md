@@ -1,2 +1,6 @@
-# News_aggregator_in_go
-News_aggregator_in_GO
+# Washington News Aggregator
+
+To run:
+```
+go run main.go
+```
