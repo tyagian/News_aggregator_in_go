@@ -12,7 +12,7 @@ func cleanup() {
 	if r := recover(); r != nil {
 		fmt.Println("Recovered in cleanup",r)
 	}
-	
+
 }
 
 func say(s string) {
